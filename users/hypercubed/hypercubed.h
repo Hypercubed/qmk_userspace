@@ -278,16 +278,17 @@ enum my_keycodes {
 #define SYM_MINS _______
 #define SYM_RBRC _______
 #define SYM_QUOT _______
+#define SYM_P2 _______
+#define SYM_P3 _______
+#define SYM_GRV _______
 
-inline bool register_unicode_up(uint16_t x, uint16_t y, keyrecord_t *record) {
-    if (record->event.pressed) {
-        register_unicodemap(unicodemap_index(UP(x, y)));
-    }
-    return false;
-}
+// Helpers
+#define SEND(X, Y) send(X, Y, record)
+#define SEND_UNICODE_UP(X, Y) send_unicode_up(get_index(x, y))
 
 bool process_greek(uint16_t keycode, keyrecord_t *record);
 bool process_symbol(uint16_t keycode, keyrecord_t *record);
 bool process_record_unicode(uint16_t keycode, keyrecord_t *record);
+void leader_unicode(void);
 
 #endif

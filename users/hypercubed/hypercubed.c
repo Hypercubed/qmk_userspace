@@ -1,4 +1,5 @@
 #include "hypercubed.h"
+#include "keymap_us_international.h"
 
 const uint32_t PROGMEM unicode_map[] = {
     // GREEK 1234 ROW
@@ -68,12 +69,12 @@ const uint32_t PROGMEM unicode_map[] = {
     [U_GR_WCIRCLE]  = L'○',
 
     // GREEK ZXCV ROW
-    [U_GR_L_ZETA] = L'ζ',
-    [U_GR_U_ZETA] = L'Ζ',
-    [U_GR_L_CHI]  = L'χ',
-    [U_GR_U_CHI]  = L'Χ',
-    [U_GR_L_XI]   = L'ξ',
-    [U_GR_U_XI]   = L'Ξ',
+    [U_GR_L_ZETA]  = L'ζ',
+    [U_GR_U_ZETA]  = L'Ζ',
+    [U_GR_L_CHI]   = L'χ',
+    [U_GR_U_CHI]   = L'Χ',
+    [U_GR_L_XI]    = L'ξ',
+    [U_GR_U_XI]    = L'Ξ',
     [U_GR_L_BETA]  = L'β',
     [U_GR_U_BETA]  = L'B',
     [U_GR_L_NU]    = L'ν',
@@ -148,7 +149,7 @@ const uint32_t PROGMEM unicode_map[] = {
     [U_SYM_NEQ]       = L'≠',
     [U_SYM_CSET]      = L'ℂ',
     [U_SYM_AEQL]      = L'≃',
-    [U_SYM_ALEQL]      = L'≈',
+    [U_SYM_ALEQL]     = L'≈',
     [U_SYM_EQUIV]     = L'≡',
     [U_SYM_LTEQ]      = L'≤',
     [U_SYM_NSET]      = L'ℕ',
@@ -156,110 +157,156 @@ const uint32_t PROGMEM unicode_map[] = {
     [U_SYM_SQ_LS]     = L'⊏',
     [U_SYM_SQ_RS]     = L'⊐',
     [U_SYM_IQST]      = L'¿',
-    [U_SYM_INTROBANG] = L'‽'
-};
+    [U_SYM_INTROBANG] = L'‽'};
+
+#define MODS_SHIFT_MASK (MOD_BIT(KC_LSFT) | MOD_BIT(KC_RSFT))
+
+uint8_t get_index(uint16_t x, uint16_t y) {
+    uint8_t mods = get_mods() | get_weak_mods();
+#ifndef NO_ACTION_ONESHOT
+    mods |= get_oneshot_mods();
+#endif
+    bool shift = mods & MOD_MASK_SHIFT;
+    bool caps  = host_keyboard_led_state().caps_lock;
+    return (shift ^ caps) ? y : x;
+}
+
+void send_unicode_up(uint16_t keycode) {
+    bool is_windows_HexNumpad = get_unicode_input_mode() == UNICODE_MODE_WINDOWS;
+
+    if (is_windows_HexNumpad) {
+        switch (keycode) {
+            case U_GR_DIV:
+                SEND_STRING(SS_DOWN(X_LALT) SS_TAP(X_P0) SS_TAP(X_P2) SS_TAP(X_P4) SS_TAP(X_P7) SS_UP(X_LALT));
+                return;
+            case U_GR_MUL:
+                SEND_STRING(SS_DOWN(X_LALT) SS_TAP(X_P0) SS_TAP(X_P2) SS_TAP(X_P1) SS_TAP(X_P5) SS_UP(X_LALT));
+                return;
+            case U_SYM_HALF:
+                SEND_STRING(SS_DOWN(X_LALT) SS_TAP(X_P0) SS_TAP(X_P1) SS_TAP(X_P8) SS_TAP(X_P9) SS_UP(X_LALT));
+                return;
+            case U_SYM_TQTR:
+                SEND_STRING(SS_DOWN(X_LALT) SS_TAP(X_P0) SS_TAP(X_P1) SS_TAP(X_P9) SS_TAP(X_P0) SS_UP(X_LALT));
+                return;
+            case U_SYM_INIFIN:
+                SEND_STRING(SS_DOWN(X_LALT) SS_TAP(X_P2) SS_TAP(X_P3) SS_TAP(X_P6) SS_UP(X_LALT));
+                return;
+            case UC_IQST:
+                SEND_STRING(SS_DOWN(X_LALT) SS_TAP(X_P1) SS_TAP(X_P6) SS_TAP(X_P8) SS_UP(X_LALT));
+                return;
+        }
+    }
+    register_unicodemap(keycode);
+}
+
+inline bool send(uint16_t x, uint16_t y, keyrecord_t *record) {
+    if (record->event.pressed) {
+        SEND_UNICODE_UP(x, y);
+    }
+    return false;
+}
 
 bool process_greek(uint16_t keycode, keyrecord_t *record) {
     switch (keycode) {
             // GREEK 1234 ROW
         case GR_GRV:
-            return register_unicode_up(U_GR_SECTION, U_GR_SECTION, record);
+            return SEND(U_GR_SECTION, U_GR_SECTION);
         case GR_1:
-            return register_unicode_up(U_GR_DAGG, U_GR_DAGG, record);
+            return SEND(U_GR_DAGG, U_GR_DAGG);
         case GR_2:
-            return register_unicode_up(U_GR_DDAG, U_GR_DDAG, record);
+            return SEND(U_GR_DDAG, U_GR_DDAG);
         case GR_3:
-            return register_unicode_up(U_GR_NABLA, U_GR_NABLA, record);
+            return SEND(U_GR_NABLA, U_GR_NABLA);
         case GR_4:
-            return register_unicode_up(U_GR_CENT, U_GR_CENT, record);
+            return SEND(U_GR_CENT, U_GR_CENT);
         case GR_5:
-            return register_unicode_up(U_GR_DEGREE, U_GR_DEGREE, record);
+            return SEND(U_GR_DEGREE, U_GR_DEGREE);
         case GR_6:
-            return register_unicode_up(U_GR_SQUARE, U_GR_SQUARE, record);
+            return SEND(U_GR_SQUARE, U_GR_SQUARE);
         case GR_7:
-            return register_unicode_up(U_GR_DIV, U_GR_DIV, record);
+            return SEND(U_GR_DIV, U_GR_DIV);
         case GR_8:
-            return register_unicode_up(U_GR_MUL, U_GR_MUL, record);
+            return SEND(U_GR_MUL, U_GR_MUL);
+            return false;
         case GR_9:
-            return register_unicode_up(U_GR_PARA, U_GR_PARA, record);
+            return SEND(U_GR_PARA, U_GR_PARA);
         case GR_0:
-            return register_unicode_up(U_GR_WDOT, U_GR_LWDOT, record);
+            return SEND(U_GR_WDOT, U_GR_LWDOT);
         case GR_MINS:
-            return register_unicode_up(U_GR_EMDASH, U_GR_EMDASH, record);
+            return SEND(U_GR_EMDASH, U_GR_EMDASH);
         case GR_EQL:
-            return register_unicode_up(U_GR_AEQL, U_GR_AEQL, record);
-
+            return SEND(U_GR_AEQL, U_GR_AEQL);
             // GREEK QWER ROW
         case GR_Q:
-            return register_unicode_up(U_GR_L_THETA, U_GR_U_THETA, record);
+            return SEND(U_GR_L_THETA, U_GR_U_THETA);
         case GR_W:
-            return register_unicode_up(U_GR_L_OMEGA, U_GR_U_OMEGA, record);
+            return SEND(U_GR_L_OMEGA, U_GR_U_OMEGA);
         case GR_E:
-            return register_unicode_up(U_GR_L_EPSILON, U_GR_U_EPSILON, record);
+            return SEND(U_GR_L_EPSILON, U_GR_U_EPSILON);
         case GR_R:
-            return register_unicode_up(U_GR_L_RHO, U_GR_U_RHO, record);
+            return SEND(U_GR_L_RHO, U_GR_U_RHO);
         case GR_T:
-            return register_unicode_up(U_GR_L_TAU, U_GR_U_TAU, record);
+            return SEND(U_GR_L_TAU, U_GR_U_TAU);
         case GR_Y:
-            return register_unicode_up(U_GR_L_PSI, U_GR_U_PSI, record);
+            return SEND(U_GR_L_PSI, U_GR_U_PSI);
         case GR_U:
-            return register_unicode_up(U_GR_L_UPSILON, U_GR_U_UPSILON, record);
+            return SEND(U_GR_L_UPSILON, U_GR_U_UPSILON);
         case GR_I:
-            return register_unicode_up(U_GR_L_IOTA, U_GR_U_IOTA, record);
+            return SEND(U_GR_L_IOTA, U_GR_U_IOTA);
         case GR_O:
-            return register_unicode_up(U_GR_L_OMICRON, U_GR_U_OMICRON, record);
+            return SEND(U_GR_L_OMICRON, U_GR_U_OMICRON);
         case GR_P:
-            return register_unicode_up(U_GR_L_PI, U_GR_U_PI, record);
+            return SEND(U_GR_L_PI, U_GR_U_PI);
         case GR_LBRC:
-            return register_unicode_up(U_GR_LWSQBKT, U_GR_LWSQBKT, record);
+            return SEND(U_GR_LWSQBKT, U_GR_LWSQBKT);
         case GR_RBRC:
-            return register_unicode_up(U_GR_RWSQBKT, U_GR_RWSQBKT, record);
+            return SEND(U_GR_RWSQBKT, U_GR_RWSQBKT);
         case GR_BSLS:
-            return register_unicode_up(U_GR_NOT, U_GR_RNOT, record);
+            return SEND(U_GR_NOT, U_GR_RNOT);
 
             // GREEK ASDF ROW
         case GR_A:
-            return register_unicode_up(U_GR_L_ALPHA, U_GR_U_ALPHA, record);
+            return SEND(U_GR_L_ALPHA, U_GR_U_ALPHA);
         case GR_S:
-            return register_unicode_up(U_GR_L_SIGMA, U_GR_U_SIGMA, record);
+            return SEND(U_GR_L_SIGMA, U_GR_U_SIGMA);
         case GR_D:
-            return register_unicode_up(U_GR_L_DELTA, U_GR_U_DELTA, record);
+            return SEND(U_GR_L_DELTA, U_GR_U_DELTA);
         case GR_F:
-            return register_unicode_up(U_GR_L_PHI, U_GR_U_PHI, record);
+            return SEND(U_GR_L_PHI, U_GR_U_PHI);
         case GR_G:
-            return register_unicode_up(U_GR_L_GAMMA, U_GR_U_GAMMA, record);
+            return SEND(U_GR_L_GAMMA, U_GR_U_GAMMA);
         case GR_H:
-            return register_unicode_up(U_GR_L_ETA, U_GR_U_ETA, record);
+            return SEND(U_GR_L_ETA, U_GR_U_ETA);
         case GR_J:
-            return register_unicode_up(U_GR_L_XI, U_GR_U_XI, record);
+            return SEND(U_GR_L_XI, U_GR_U_XI);
         case GR_K:
-            return register_unicode_up(U_GR_L_KAPPA, U_GR_U_KAPPA, record);
+            return SEND(U_GR_L_KAPPA, U_GR_U_KAPPA);
         case GR_L:
-            return register_unicode_up(U_GR_L_LAMBDA, U_GR_U_LAMBDA, record);
+            return SEND(U_GR_L_LAMBDA, U_GR_U_LAMBDA);
         case GR_SCLN:
-            return register_unicode_up(U_GR_TDOT, U_GR_ELLIPSES, record);
+            return SEND(U_GR_TDOT, U_GR_ELLIPSES);
         case GR_QUOT:
-            return register_unicode_up(U_GR_BULT, U_GR_WCIRCLE, record);
+            return SEND(U_GR_BULT, U_GR_WCIRCLE);
 
             // GREEK ZXCV ROW
         case GR_Z:
-            return register_unicode_up(U_GR_L_ZETA, U_GR_U_ZETA, record);
+            return SEND(U_GR_L_ZETA, U_GR_U_ZETA);
         case GR_X:
-            return register_unicode_up(U_GR_L_CHI, U_GR_U_CHI, record);
+            return SEND(U_GR_L_CHI, U_GR_U_CHI);
         case GR_C:
-            return register_unicode_up(U_GR_L_XI, U_GR_U_XI, record);
+            return SEND(U_GR_L_XI, U_GR_U_XI);
         case GR_B:
-            return register_unicode_up(U_GR_L_BETA, U_GR_U_BETA, record);
+            return SEND(U_GR_L_BETA, U_GR_U_BETA);
         case GR_N:
-            return register_unicode_up(U_GR_L_NU, U_GR_U_NU, record);
+            return SEND(U_GR_L_NU, U_GR_U_NU);
         case GR_M:
-            return register_unicode_up(U_GR_L_MU, U_GR_U_MU, record);
+            return SEND(U_GR_L_MU, U_GR_U_MU);
         case GR_COMM:
-            return register_unicode_up(U_GR_LDQUOTE, U_GR_LDQUOTE, record);
+            return SEND(U_GR_LDQUOTE, U_GR_LDQUOTE);
         case GR_DOT:
-            return register_unicode_up(U_GR_RDQUOTE, U_GR_RDQUOTE, record);
+            return SEND(U_GR_RDQUOTE, U_GR_RDQUOTE);
         case GR_SLSH:
-            return register_unicode_up(U_GR_INT, U_GR_ROOT, record);
+            return SEND(U_GR_INT, U_GR_ROOT);
 
         default:
             return true; // Process all other keycodes normally
@@ -270,92 +317,93 @@ bool process_symbol(uint16_t keycode, keyrecord_t *record) {
     switch (keycode) {
             // SYMBOLS 1234 ROW
         case SYM_1:
-            return register_unicode_up(U_SYM_SUP1, U_SYM_IEXL, record);
+            return SEND(U_SYM_SUP1, U_SYM_IEXL);
         case SYM_2:
-            return register_unicode_up(U_SYM_SUP2, U_SYM_SUP2, record);
+            return SEND(U_SYM_SUP2, U_SYM_SUP2);
         case SYM_3:
-            return register_unicode_up(U_SYM_SUP3, U_SYM_PND, record);
+            return SEND(U_SYM_SUP3, U_SYM_PND);
         case SYM_4:
-            return register_unicode_up(U_SYM_HALF, U_SYM_YEN, record);
+            return SEND(U_SYM_HALF, U_SYM_YEN);
         case SYM_5:
-            return register_unicode_up(U_SYM_TQTR, U_SYM_EURO, record);
+            return SEND(U_SYM_TQTR, U_SYM_EURO);
         case SYM_8:
-            return register_unicode_up(U_SYM_DEGREE, U_SYM_DEGREE, record);
+            return SEND(U_SYM_DEGREE, U_SYM_DEGREE);
         case SYM_0:
-            return register_unicode_up(U_SYM_EMPTY, U_SYM_EMPTY, record);
+            return SEND(U_SYM_EMPTY, U_SYM_EMPTY);
         case SYM_EQL:
-            return register_unicode_up(U_SYM_PLSMINS, U_SYM_MINSPLS, record);
+            return SEND(U_SYM_PLSMINS, U_SYM_MINSPLS);
 
             // SYMBOLS QWER ROW
         case SYM_Q:
-            return register_unicode_up(U_SYM_AND, U_SYM_QSET, record);
+            return SEND(U_SYM_AND, U_SYM_QSET);
         case SYM_W:
-            return register_unicode_up(U_SYM_OR, U_SYM_OR, record);
+            return SEND(U_SYM_OR, U_SYM_OR);
         case SYM_E:
-            return register_unicode_up(U_SYM_INTERSECT, U_SYM_INTERSECT, record);
+            return SEND(U_SYM_INTERSECT, U_SYM_INTERSECT);
         case SYM_R:
-            return register_unicode_up(U_SYM_MUNION, U_SYM_RSET, record);
+            return SEND(U_SYM_MUNION, U_SYM_RSET);
         case SYM_T:
-            return register_unicode_up(U_SYM_SUBSET, U_SYM_SUBSETOREQ, record);
+            return SEND(U_SYM_SUBSET, U_SYM_SUBSETOREQ);
         case SYM_Y:
-            return register_unicode_up(U_SYM_SUPERSET, U_SYM_SUPERSETOREQ, record);
+            return SEND(U_SYM_SUPERSET, U_SYM_SUPERSETOREQ);
         case SYM_U:
-            return register_unicode_up(U_SYM_FORALL, U_SYM_FORALL, record);
+            return SEND(U_SYM_FORALL, U_SYM_FORALL);
         case SYM_I:
-            return register_unicode_up(U_SYM_INIFIN, U_SYM_INIFIN, record);
+            return SEND(U_SYM_INIFIN, U_SYM_INIFIN);
         case SYM_O:
-            return register_unicode_up(U_SYM_EXISTS, U_SYM_NEXISTS, record);
+            return SEND(U_SYM_EXISTS, U_SYM_NEXISTS);
         case SYM_P:
-            return register_unicode_up(U_SYM_PDIF, U_SYM_PDIF, record);
+            return SEND(U_SYM_PDIF, U_SYM_PDIF);
         case SYM_LBRC:
-            return register_unicode_up(U_SYM_ELEOF, U_SYM_NELEOF, record);
+            return SEND(U_SYM_ELEOF, U_SYM_NELEOF);
         case SYM_BSLS:
-            return register_unicode_up(U_SYM_DVLINE, U_SYM_TVLINE, record);
+            return SEND(U_SYM_DVLINE, U_SYM_TVLINE);
 
             // SYMBOLS ASDF ROW
         case SYM_A:
-            return register_unicode_up(U_SYM_UP_TACK, U_SYM_ANG, record);
+            return SEND(U_SYM_UP_TACK, U_SYM_ANG);
         case SYM_S:
-            return register_unicode_up(U_SYM_DOWN_TACK, U_SYM_DOWN_TACK, record);
+            return SEND(U_SYM_DOWN_TACK, U_SYM_DOWN_TACK);
         case SYM_D:
-            return register_unicode_up(U_SYM_RT_TACK, U_SYM_NABLA, record);
+            return SEND(U_SYM_RT_TACK, U_SYM_NABLA);
         case SYM_F:
-            return register_unicode_up(U_SYM_LT_TACK, U_SYM_FLAT, record);
+            return SEND(U_SYM_LT_TACK, U_SYM_FLAT);
         case SYM_G:
-            return register_unicode_up(U_SYM_UARR, U_SYM_UPPER, record);
+            return SEND(U_SYM_UARR, U_SYM_UPPER);
         case SYM_H:
-            return register_unicode_up(U_SYM_DARR, U_SYM_LOWER, record);
+            return SEND(U_SYM_DARR, U_SYM_LOWER);
         case SYM_J:
-            return register_unicode_up(U_SYM_FROM, U_SYM_IMPL_REV, record);
+            return SEND(U_SYM_FROM, U_SYM_IMPL_REV);
         case SYM_K:
-            return register_unicode_up(U_SYM_TO, U_SYM_IMPLY, record);
+            return SEND(U_SYM_TO, U_SYM_IMPLY);
         case SYM_L:
-            return register_unicode_up(U_SYM_TO_FROM, U_SYM_BICOND, record);
+            return SEND(U_SYM_TO_FROM, U_SYM_BICOND);
         case SYM_SCLN:
-            return register_unicode_up(U_SYM_THEREFORE, U_SYM_THEREFORE, record);
+            return SEND(U_SYM_THEREFORE, U_SYM_THEREFORE);
 
             // SYMBOLS ZXCV ROW
         case SYM_Z:
-            return register_unicode_up(U_SYM_LT_FLOOR, U_SYM_ZSET, record);
+            return SEND(U_SYM_LT_FLOOR, U_SYM_ZSET);
         case SYM_X:
-            return register_unicode_up(U_SYM_LT_CIEL, U_SYM_LT_CIEL, record);
+            return SEND(U_SYM_LT_CIEL, U_SYM_LT_CIEL);
         case SYM_C:
-            return register_unicode_up(U_SYM_NEQ, U_SYM_CSET, record);
+            return SEND(U_SYM_NEQ, U_SYM_CSET);
         case SYM_V:
-            return register_unicode_up(U_SYM_AEQL, U_SYM_ALEQL, record);
+            return SEND(U_SYM_AEQL, U_SYM_ALEQL);
         case SYM_B:
-            return register_unicode_up(U_SYM_EQUIV, U_SYM_EQUIV, record);
+            return SEND(U_SYM_EQUIV, U_SYM_EQUIV);
         case SYM_N:
-            return register_unicode_up(U_SYM_LTEQ, U_SYM_NSET, record);
+            return SEND(U_SYM_LTEQ, U_SYM_NSET);
         case SYM_M:
-            return register_unicode_up(U_SYM_GTEQ, U_SYM_GTEQ, record);
+            return SEND(U_SYM_GTEQ, U_SYM_GTEQ);
         case SYM_COMM:
-            return register_unicode_up(U_SYM_SQ_LS, U_SYM_SQ_LS, record);
+            return SEND(U_SYM_SQ_LS, U_SYM_SQ_LS);
         case SYM_DOT:
-            return register_unicode_up(U_SYM_SQ_RS, U_SYM_SQ_RS, record);
+            return SEND(U_SYM_SQ_RS, U_SYM_SQ_RS);
         case SYM_SLSH:
-            return register_unicode_up(U_SYM_IQST, U_SYM_INTROBANG, record);
-
+            return SEND(U_SYM_IQST, U_SYM_INTROBANG);
+        case SYM_P1:
+            return SEND(U_SYM_THUMBS_UP, U_SYM_THUMBS_DN);
         default:
             return true; // Process all other keycodes normally
     }
@@ -366,3 +414,37 @@ bool process_record_unicode(uint16_t keycode, keyrecord_t *record) {
     if (!process_symbol(keycode, record)) return false;
     return true; // Process all other keycodes normally
 }
+
+void leader_unicode(void) {
+    if (leader_sequence_two_keys(KC_1, KC_2)) {
+        register_unicodemap(U_SYM_HALF);
+    } else if (leader_sequence_two_keys(KC_3, KC_4)) {
+        register_unicodemap(U_SYM_TQTR);
+    } else if (leader_sequence_two_keys(KC_SLSH, KC_0)) {
+        register_unicodemap(U_SYM_EMPTY);
+    } else if (leader_sequence_two_keys(KC_BSLS, KC_SLSH)) { // \/
+        register_unicodemap(U_SYM_OR);
+    } else if (leader_sequence_two_keys(KC_SLSH, KC_BSLS)) {
+        register_unicodemap(U_SYM_AND);
+    } else if (leader_sequence_two_keys(KC_EQL, KC_MINS)) {
+        register_unicodemap(U_SYM_PLSMINS);
+    } else if (leader_sequence_two_keys(KC_MINS, KC_EQL)) {
+        register_unicodemap(U_SYM_MINSPLS);
+    } else if (leader_sequence_two_keys(KC_GRV, KC_A)) {
+        register_unicodemap(U_GR_L_ALPHA);
+    } else if (leader_sequence_three_keys(KC_GRV, KC_LSFT, KC_A)) {
+        register_unicodemap(U_SYM_ANG);
+    } else if (leader_sequence_two_keys(KC_BSLS, KC_R)) {
+        register_unicodemap(U_SYM_RSET);
+    } else if (leader_sequence_two_keys(KC_6, KC_1)) {
+        register_unicodemap(U_SYM_SUP1);
+    } else if (leader_sequence_two_keys(KC_6, KC_2)) {
+        register_unicodemap(U_SYM_SUP2);
+    } else if (leader_sequence_two_keys(KC_6, KC_3)) {
+        register_unicodemap(U_SYM_SUP3);
+    } else if (leader_sequence_three_keys(KC_SLSH, KC_SLSH, KC_SLSH)) {
+        register_unicodemap(U_GR_ELLIPSES);
+    }
+}
+
+
