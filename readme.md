@@ -2,10 +2,17 @@
 
 This is my personal QMK userspace, a collection of keymaps and other QMK related files that I use for my keyboard(s).
 
+## Features
+
+* Greek and Symbol Layers
+* Unicode characters using HexNumpad in both Windows and MacOS with Alt-code backup for problematic characters
+* Using (Keychron v6) dip switch to change unicode mode
+* Leader key support
+
 ## Layout
 
 ![Layout](./keyboard-layout.png)
-[keyboard-layout-editor.com](http://www.keyboard-layout-editor.com/#/gists/e796a7a562043497ed079116fce5ce15)
+[keyboard-layout-editor.com](http://www.keyboard-layout-editor.com/#/gists/912555eb0e702d68f874cf1906143ca6)
 
 ## OS Support
 

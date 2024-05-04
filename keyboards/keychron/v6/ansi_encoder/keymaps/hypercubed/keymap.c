@@ -54,11 +54,11 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         KC_LCTL,  KC_LWIN,  KC_LALT,                                KC_SPC,                                 MO(GREEK),  MO(SYMBOLS),  MO(WIN_FN), QK_LEADER,  KC_LEFT,  KC_DOWN,  KC_RGHT,  KC_P0,              KC_PDOT,  KC_PENT),
     [WIN_FN] = LAYOUT_ansi_109(
         _______,  KC_BRID,  KC_BRIU,  KC_TASK,  KC_FLXP,  RGB_VAD,  RGB_VAI,  KC_MPRV,  KC_MPLY,  KC_MNXT,  KC_MUTE,  KC_VOLD,  KC_VOLU,    RGB_TOG,    _______,  _______,  RGB_TOG,  _______,  _______,  _______,  _______,
-        _______,  _______,  _______,  _______,  _______,  _______,  _______,  _______,  _______,  _______,  _______,  _______,  _______,    _______,    _______,  _______,  _______,  _______,  _______,  _______,  _______,
-        RGB_TOG,  RGB_MOD,  RGB_VAI,  RGB_HUI,  RGB_SAI,  RGB_SPI,  _______,  _______,  _______,  _______,  _______,  _______,  _______,    _______,    _______,  _______,  _______,  _______,  _______,  _______,
-        _______,  RGB_RMOD, RGB_VAD,  RGB_HUD,  RGB_SAD,  RGB_SPD,  _______,  _______,  _______,  _______,  _______,  _______,              _______,                                  _______,  _______,  _______,  _______,
-        _______,            _______,  _______,  _______,  _______,  _______,  NK_TOGG,  _______,  _______,  _______,  _______,              _______,              _______,            _______,  _______,  _______,
-        _______,  _______,  _______,                                _______,                                _______,  _______,  _______,    _______,    _______,  _______,  _______,  _______,            _______,  _______),
+        _______,  _______,  _______,  _______,  _______,  _______,  _______,  _______,  _______,  _______,  _______,  _______,        _______,    _______,    _______,  _______,  _______,  _______,  _______,  _______,  _______,
+        RGB_TOG,  RGB_MOD,  RGB_VAI,  RGB_HUI,  RGB_SAI,  RGB_SPI,  _______,  _______,  _______,  _______,  _______,  _______,        _______,    _______,    _______,  _______,  _______,  _______,  _______,  _______,
+        _______,  RGB_RMOD, RGB_VAD,  RGB_HUD,  RGB_SAD,  RGB_SPD,  _______,  _______,  _______,  _______,  _______,  _______,                    _______,                                  _______,  _______,  _______,  _______,
+        _______,            _______,  _______,  _______,  _______,  _______,  NK_TOGG,  _______,  _______,  _______,  _______,                    _______,              _______,            _______,  _______,  _______,
+        QK_BOOT,  _______,  _______,                                _______,                                _______,  _______,        _______,    _______,    _______,  _______,  _______,  _______,            _______,  _______),
     [GREEK] = LAYOUT_ansi_109(
         _______,  _______,  _______,  _______,  _______,  _______,  _______,  _______,  _______,  _______,  _______,  _______,  _______,   _______,    _______,  _______,  _______,  _______,  _______,  _______,  _______,
         GR_GRV,   GR_1,     GR_2,     GR_3,     GR_4,     GR_5,     GR_6,    GR_7,      GR_8,     GR_9,     GR_0,     GR_MINS,  GR_EQL,    _______,    _______,  _______,  _______,  _______,  _______,  _______,  _______,
@@ -71,7 +71,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         SYM_GRV,  SYM_1,    SYM_2,    SYM_3,    SYM_4,    SYM_5,    SYM_6,    SYM_7,    SYM_8,    SYM_9,    SYM_0,    SYM_MINS, SYM_EQL,   _______,    _______,  _______,  _______,  _______,  _______,  _______,  _______,
         _______,  SYM_Q,    SYM_W,    SYM_E,    SYM_R,    SYM_T,    SYM_Y,    SYM_U,    SYM_I,    SYM_O,    SYM_P,    SYM_LBRC, SYM_RBRC,  SYM_BSLS,   _______,  _______,  _______,  _______,  _______,  _______,
         _______,  SYM_A,    SYM_S,    SYM_D,    SYM_F,    SYM_G,    SYM_H,    SYM_J,    SYM_K,    SYM_L,    SYM_SCLN, SYM_QUOT,            _______,                                  _______,  _______,  _______,  _______,
-        _______,            SYM_Z,    SYM_X,    SYM_C,    SYM_V,    SYM_B,    SYM_N,    SYM_M,    SYM_COMM, SYM_DOT,  SYM_SLSH,            _______,              _______,            SYM_P1,   SYM_P2,   SYM_P3,
+        _______,            SYM_Z,    SYM_X,    SYM_C,    SYM_V,    SYM_B,    SYM_N,    SYM_M,    SYM_COMM, SYM_DOT,  SYM_SLSH,            _______,              _______,            _______,  _______,  _______,
         _______,  _______,  _______,                                _______,                                _______,  _______,  _______,   _______,    _______,  _______,  _______,  _______,            _______,  _______),
 };
 
@@ -124,4 +124,12 @@ bool dip_switch_update_user(uint8_t index, bool active) {
         set_unicode_input_mode(is_windows ? UNICODE_MODE_WINDOWS : UNICODE_MODE_MACOS);
     }
     return true;
+}
+
+void keyboard_post_init_user(void) {
+  // Customise these values to desired behaviour
+//   debug_enable=true;
+//   debug_matrix=true;
+  //debug_keyboard=true;
+  //debug_mouse=true;
 }
