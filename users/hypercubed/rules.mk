@@ -1,3 +1,4 @@
 SRC += hypercubed.c
-SRC += ac.c
-SRC += uc.c
+SRC += ascii.c
+SRC += unicode_mod.c
+SRC += compose.c

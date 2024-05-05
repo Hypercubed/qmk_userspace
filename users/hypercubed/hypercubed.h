@@ -3,10 +3,8 @@
 #ifndef USERSPACE
 #define USERSPACE
 
-#include "quantum.h"
-#include "ac.h"
-#include "uc.h"
-
-void leader_unicode(void);
+#include "unicode_mod.h"
+#include "ascii.h"
+#include "compose.h"
 
 #endif
